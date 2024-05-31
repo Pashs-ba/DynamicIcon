@@ -1,0 +1,5 @@
+name: "dynamic-icons"
+
+services:
+  dynamic-icon:
+    build: .

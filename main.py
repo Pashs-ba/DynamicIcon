@@ -1,20 +1,32 @@
-import os
-
-import yaml
-from telethon import TelegramClient
-from telethon.tl.functions.photos import UploadProfilePhotoRequest
+import datetime
 import asyncio
 
+from telethon import TelegramClient
+from telethon.tl.functions.photos import UploadProfilePhotoRequest, DeletePhotosRequest
+from telethon.tl.types import InputPhoto
 
-def load_config() -> dict:
-    return yaml.safe_load(open(f"{os.path.dirname(__file__)}/config.yaml"))
+from utils import load_config, get_current_image, log
 
 
 async def main(main_client: TelegramClient, config: dict):
-    async with main_client:
-        await main_client(UploadProfilePhotoRequest(
-            file=await main_client.upload_file('images/0.png')
-        ))
+    try:
+        async with main_client:
+            while True:
+                p = (await client.get_profile_photos('me'))[0]
+                await main_client(DeletePhotosRequest(
+                    id=[InputPhoto(
+                        id=p.id,
+                        access_hash=p.access_hash,
+                        file_reference=p.file_reference
+                    )]))
+                await main_client(UploadProfilePhotoRequest(
+                    file=await main_client.upload_file(get_current_image(config))
+                ))
+                log(config, f"Change icon to {get_current_image(config)}")
+                await asyncio.sleep(60 * 60)
+    except Exception as e:
+        log(config, f"ERROR: {e}")
+        exit(1)
 
 
 if __name__ == '__main__':
