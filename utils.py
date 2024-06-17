@@ -31,8 +31,7 @@ def get_current_image(config: dict) -> str:
 
 
 def log(config: dict, message: str):
-    with open(config["other"]["logfile"], "a") as f:
-        f.write(f"[{datetime.datetime.now()}] {message}\n")
+    print(f"[{datetime.datetime.now()}] {message}\n")
 
 
 if __name__ == '__main__':
